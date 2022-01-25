@@ -42,8 +42,8 @@ def set_data_globals():
 # -- ARCHITECTURE GLOBAL INFO -- #
 
 # OMR / AMT architecture fixed according to:
-# TODO
-# Ask about it
+# Miguel A. Román, Antonio Pertusa, Jorge Calvo-Zaragoza
+# Data representations for audio-to-score monophonic music transcription
 
 # filters = [8, 8]
 # kernel_size = [[10, 2], [8, 5]]
