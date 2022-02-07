@@ -7,7 +7,7 @@ import numpy as np
 from tensorflow import keras
 
 import config
-from data_processing import get_folds_filenames, get_datafolds_filenames, get_fold_vocabularies, save_w2i_dictionary, train_data_generator
+from data_processing import get_folds_filenames, get_datafolds_filenames, get_fold_vocabularies, save_w2i_dictionary, load_dictionaries, train_data_generator
 from models import build_models
 from evaluation import evaluate_model
 
@@ -68,7 +68,7 @@ def train_and_test_model(data, vocabularies, epochs, model, prediction_model, pr
 # -- EXPERIMENT TYPES -- #
 
 # Utility function for performing a k-fold cross-validation experiment on a single dataset
-def k_fold_experiment(epochs, folder_name=None, num_samples=22285):
+def k_fold_experiment(epochs, folder_name=None, num_train_samples=13371):
     keras.backend.clear_session()
     gc.collect()
 
@@ -124,12 +124,8 @@ def k_fold_experiment(epochs, folder_name=None, num_samples=22285):
         w2i, i2w = get_fold_vocabularies(train_labels)
         save_w2i_dictionary(w2i, w2i_filepath)
 
-        # Select only the desired number of samples for the incremental scheme
-        train_index = int(num_samples * 0.6)
-        val_index = test_index = int(num_samples * 0.2)
-        train_images, train_labels = train_images[:train_index], train_labels[:train_index]
-        val_images, val_labels = val_images[:val_index], val_labels[:val_index]
-        test_images, test_labels = test_images[:test_index], test_labels[:test_index]
+        # Select the desired number of training samples for the incremental scheme
+        train_images, train_labels = train_images[:num_train_samples], train_labels[:num_train_samples]
 
         assert len(train_images) == len(train_labels)
         assert len(val_images) == len(val_labels)
@@ -162,15 +158,17 @@ def k_fold_experiment(epochs, folder_name=None, num_samples=22285):
 # --------------------
 
 # Utility function for performing a k-fold cross-validation transfer learning experiment on a single dataset
-def k_fold_transfer_learning_experiment(epochs, folder_name, frozen_layers, num_samples=22285):
+def k_fold_transfer_learning_experiment(epochs, folder_name, frozen_layers, num_train_samples=13371, pretrained="omr"):
     keras.backend.clear_session()
     gc.collect()
 
     # ---------- PRINT EXPERIMENT DETAILS
 
     print("k-fold cross-validation transfer learning experiment")
-    # TODO RIGHT NOW, TRANSFER LEARNING STARTS FROM A PRETRAINED OMR MODEL
-    print("Using an OMR pretrained model to transfer its learning into an AMT model")
+    if pretrained == "omr":
+        print("Using an OMR pretrained model to transfer its learning into an AMT model")
+    else:
+        print("Using an AMT pretrained model to transfer its learning into an OMR model")
     print(f"Layers to freeze: {frozen_layers}")
     print(f"Data used {config.base_dir.stem}")
 
@@ -220,12 +218,8 @@ def k_fold_transfer_learning_experiment(epochs, folder_name, frozen_layers, num_
         w2i, i2w = get_fold_vocabularies(train_labels)
         save_w2i_dictionary(w2i, w2i_filepath)
 
-        # Select only the desired number of samples for the incremental scheme
-        train_index = int(num_samples * 0.6)
-        val_index = test_index = int(num_samples * 0.2)
-        train_images, train_labels = train_images[:train_index], train_labels[:train_index]
-        val_images, val_labels = val_images[:val_index], val_labels[:val_index]
-        test_images, test_labels = test_images[:test_index], test_labels[:test_index]
+        # Select the desired number of training samples for the incremental scheme
+        train_images, train_labels = train_images[:num_train_samples], train_labels[:num_train_samples]
 
         assert len(train_images) == len(train_labels)
         assert len(val_images) == len(val_labels)
@@ -237,9 +231,9 @@ def k_fold_transfer_learning_experiment(epochs, folder_name, frozen_layers, num_
 
         # Build the model used only for training
         model = build_models(num_labels=len(w2i))[0]
-        # Load the weights of an OMR pretrained model into the previously created model
-        omr_pretrained_prediction_model_filepath = config.base_dir / "SMC-2022" / "Experiments" / "TaskSpecific" / "omr" / f"Fold{i}" / "best_model.keras"
-        model.load_weights(filepath=omr_pretrained_prediction_model_filepath)
+        # Load the weights of a pretrained model into the previously created model
+        pretrained_prediction_model_filepath = config.base_dir / "SMC-2022" / "Experiments" / "TaskSpecific" / f"{pretrained}" / f"Fold{i}" / "best_model.keras"
+        model.load_weights(filepath=pretrained_prediction_model_filepath, by_name=True) 
         # Freeze some layers 
         for layer in model.layers:
             if layer.name in frozen_layers:
@@ -269,4 +263,76 @@ def k_fold_transfer_learning_experiment(epochs, folder_name, frozen_layers, num_
         del train_images, train_labels, val_images, val_labels, test_images, test_labels
         del model, prediction_model
         
+    return
+
+# --------------------
+
+# Utility function for performing a k-fold test experiment
+def k_fold_test_experiment(test_type: str, model_folder_name: str):
+    keras.backend.clear_session()
+    gc.collect()
+
+    # ---------- PRINT EXPERIMENT DETAILS
+
+    print("k-fold test experiment")
+    print(f"Data used {config.base_dir.stem}")
+    print(f"Evaluating model {model_folder_name} on {test_type.upper()} data")
+
+    # ---------- DATA COLLECTION
+
+    config.set_task(value=test_type)
+    config.set_data_globals()
+    config.set_arch_globals()
+    test_folds_files = get_folds_filenames("test")
+    test_images_fnames, test_labels_fnames = get_datafolds_filenames(test_folds_files) 
+
+    # ---------- K-FOLD EVALUATION
+
+    test_symer_acc = []
+    test_seqer_acc = []
+
+    # Start the k-fold evaluation scheme
+    # k = len(test_images_fnames)
+    # for i in range(k):
+
+    # For the SMC 2022, we are going to do 0-Fold due to time restrictions
+    # We use the first fold of the 5-crossval folder
+    for i in range(1):
+        # With 'clear_session()' called at the beginning,
+        # Keras starts with a blank state at each iteration
+        # and memory consumption is constant over time.
+        keras.backend.clear_session()
+        gc.collect()
+
+        print(f"Fold {i}")
+
+        # Set filepaths
+        output_dir = model_folder_name / f"Fold{i}"
+        pred_model_filepath = output_dir / "best_model.keras"
+        w2i_filepath = output_dir / "w2i.json"
+        log_path = output_dir / f"test_on_{test_type}_logs.csv"
+
+        # Get the current fold data
+        test_images, test_labels = test_images_fnames[i], test_labels_fnames[i]
+        assert len(test_images) == len(test_labels)
+        print(f"Test: {len(test_images)}")
+
+        # Get vocabularies
+        i2w = load_dictionaries(w2i_filepath)[1]
+
+        # Load and test model
+        prediction_model = keras.models.load_model(pred_model_filepath)
+        test_symer, test_seqer = evaluate_model(prediction_model, test_images, test_labels, i2w)
+        test_symer_acc.append(test_symer)
+        test_seqer_acc.append(test_seqer)
+
+        # Clear memory
+        del test_images, test_labels
+        del prediction_model
+
+    # Save fold logs
+    logs = {"test_symer": test_symer_acc, "test_seqer": test_seqer_acc}
+    logs = pd.DataFrame.from_dict(logs)
+    logs.to_csv(log_path, index=False)
+
     return
