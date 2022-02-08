@@ -1,7 +1,7 @@
 # Transfer learning for music transcription
 
 **María Alfaro-Contreras**, Jose J. Valero-Mas, Jose M. Iñesta, Jorge Calvo-Zaragoza<br />
-*Transfer learning for music transcription*<br />
+*Insights into transfer learning between image and audio music transcription*<br />
 19th Sound and Music Computing Conference, June 4th-12th 2022
 
 Dataset used: **Camera-PrIMuS**. Available [here](https://grfia.dlsi.ua.es/primus/).
