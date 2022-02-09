@@ -52,15 +52,13 @@ def set_data_globals():
 # lstm_units = [256, 256]
 # lstm_dropout = 0.5
 
+img_max_height = 256
 img_max_width = None
 
 # This is true ONLY WHEN pool_size and strides have the same shape
 width_reduction = 2
+height_reduction = 4
 
 def set_arch_globals(batch=4):
-    global img_max_height 
-    global height_reduction
     global batch_size
     batch_size = batch
-    img_max_height = 256
-    height_reduction = 4
