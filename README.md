@@ -1,5 +1,7 @@
 # Transfer learning for music transcription
 
+![Tensorflow](https://img.shields.io/badge/Tensorflow-%FFFFFF.svg?style=flat&logo=Tensorflow&logoColor=orange&color=white) [![License](https://img.shields.io/static/v1?label=License&message=MIT&color=blue)]() 
+
 Code for the paper:<br />
   >**María Alfaro-Contreras**, Jose J. Valero-Mas, Jose M. Iñesta, Jorge Calvo-Zaragoza<br />
   *[Insights into transfer learning between image and audio music transcription](https://zenodo.org/record/6573248)*<br />
