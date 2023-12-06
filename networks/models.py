@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -9,7 +9,6 @@ from tensorflow.keras import layers
 # Data representations for audio-to-score monophonic music transcription
 
 INPUT_HEIGHT = 256
-
 POOLING_FACTORS = {"height_reduction": 4, "width_reduction": 2}
 
 
@@ -83,4 +82,31 @@ def build_models(num_labels: int) -> Tuple[keras.Model, keras.Model]:
     # At inference time, we only have the image as input and the softmax prediction as output
     prediction_model = keras.Model(model.get_layer("image").input, output)
 
+    return model, prediction_model
+
+
+def build_models_from_pretrained(
+    num_labels: int,
+    pretrained_model_filepath: str,
+    frozen_layers_names: List[str],
+) -> Tuple[keras.Model, keras.Model]:
+    # Build the model used only for training
+    model, _ = build_models(num_labels)
+    # Load the weights of a pretrained model into the previously created model
+    model.load_weights(filepath=pretrained_model_filepath, by_name=True)
+    # Freeze some layers
+    for layer in model.layers:
+        if layer.name in frozen_layers_names:
+            layer.trainable = False
+            print(f"Layer {layer.name} trainable? {layer.trainable}")
+    # Interaction between trainable and compile()
+    # Source: https://keras.io/getting_started/faq/#how-can-i-freeze-layers-and-do-finetuning
+    model.compile(
+        optimizer=keras.optimizers.Adam(),
+        loss={"ctc_loss": lambda y_true, y_pred: y_pred},
+    )
+    # Create the prediction model
+    prediction_model = keras.Model(
+        model.get_layer("image").input, model.get_layer("Dense").output
+    )
     return model, prediction_model
