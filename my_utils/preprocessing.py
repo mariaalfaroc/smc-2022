@@ -24,10 +24,10 @@ def resize_image(image: np.ndarray, new_height: int) -> np.ndarray:
 def preprocess_image(image_path: str) -> Tuple[np.ndarray, int]:
     img = cv2.imread(image_path, 0)  # Read as grayscale
     img = (255.0 - img) / 255.0
-    img = resize_image(img, INPUT_HEIGHT["omr"])
+    img = resize_image(img, INPUT_HEIGHT)
     img = np.expand_dims(img, -1)
     img = img.astype("float32")
-    return img, img.shape[1] // POOLING_FACTORS["omr"]["width_reduction"]
+    return img, img.shape[1] // POOLING_FACTORS["width_reduction"]
 
 
 # Preprocess audio:
@@ -47,10 +47,10 @@ def preprocess_audio(audio_path: str) -> Tuple[np.ndarray, int]:
     spec = librosa.amplitude_to_db(abs(spec), ref=np.max)
     spec = np.flip(spec, 0)
     spec = (80.0 + spec) / 80.0
-    spec = resize_image(spec, INPUT_HEIGHT["amt"])
+    spec = resize_image(spec, INPUT_HEIGHT)
     spec = np.expand_dims(spec, -1)
     spec = spec.astype("float32")
-    return spec, spec.shape[1] // POOLING_FACTORS["amt"]["width_reduction"]
+    return spec, spec.shape[1] // POOLING_FACTORS["width_reduction"]
 
 
 def preprocess_input(task: str, input_path: str):
