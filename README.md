@@ -1,36 +1,84 @@
-# Transfer learning for music transcription
+<p align="center">
+  <a href=""><img src="https://i.imgur.com/Iu7CvC1.png" alt="PRAIG-logo" width="100"></a>
+</p>
 
-![Tensorflow](https://img.shields.io/badge/Tensorflow-%FFFFFF.svg?style=flat&logo=Tensorflow&logoColor=orange&color=white) [![License](https://img.shields.io/static/v1?label=License&message=MIT&color=blue)]() 
+<h1 align="center">Insights into transfer learning between image and audio music transcription</h1>
 
-Code for the paper:<br />
-  >**María Alfaro-Contreras**, Jose J. Valero-Mas, Jose M. Iñesta, Jorge Calvo-Zaragoza<br />
-  *[Insights into transfer learning between image and audio music transcription](https://zenodo.org/record/6573248)*<br />
-  19th Sound and Music Computing Conference, June 4th-12th 2022
+<h4 align="center">Full text available <a href="https://zenodo.org/record/6573248" target="_blank">here</a>.</h4>
 
-Dataset used: **Camera-PrIMuS**. Available [here](https://grfia.dlsi.ua.es/primus/).
-The partitions used can be found in the 5-crossval.zip file.
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.9.0-orange" alt="Gitter">
+  <img src="https://img.shields.io/badge/Tensorflow-%FFFFFF.svg?style=flat&logo=Tensorflow&logoColor=orange&color=white" alt="Tensorflow">
+  <img src="https://img.shields.io/static/v1?label=License&message=MIT&color=blue" alt="License">
+</p>
 
-----
 
-**Citation**
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#how-to-use">How To Use</a> •
+  <a href="#citations">Citations</a> •
+  <a href="#acknowledgments">Acknowledgments</a> •
+  <a href="#license">License</a>
+</p>
+
+
+## About
+
+# TODO: Describe the work. Add scheme if possible
+
+## How To Use
+
+### Dataset
+
+We use the [**Camera-PrIMuS**](https://grfia.dlsi.ua.es/primus/) dataset.
+
+The Camera-PrIMuS dataset contains 87&nbsp;678[^2] real-music incipits[^3], each represented by six files: (i) the Plaine and Easie code source, (ii) an image with the rendered score, (iii) a distorted image, (iv) the musical symbolic representation of the incipit both in Music Encoding Initiative format (MEI) and (v) in an on-purpose simplified encoding (semantic encoding), and (vi) a sequence containing the graphical symbols shown in the score with their position in the staff without any musical meaning (agnostic encoding).
+
+[^2]: In this work, we consider 22&nbsp;285 samples out of the total 87&nbsp;678 that constitute the complete Camera-PrIMuS dataset. This selection resulted from a data curation process, primarily involving the removal of samples containing long multi-rests. These music events contribute minimally to the length of the score image but may span a large number of frames in the audio signal.
+
+[^3]: An incipit is a sequence of notes, typically the first ones, used for identifying a melody or musical work.
+
+To obtain the corresponding audio files, we must convert one of the provided representations to MIDI and then synthesize the MIDI data. We have opted to convert the semantic representation, as there is a publicly available semantic-to-MIDI converter. Once we have obtained the MIDI files, we render them using FluidSynth.
+
+The specific steps to follow are:
+1) Download the semantic-to-MIDI converter from [here](https://grfia.dlsi.ua.es/primus/primus_converter.tgz) and **place the `omr-3.0-SNAPSHOT.jar` file in the [`dataset`](dataset) folder**.
+2) Download a [General MIDI SounFont (sf2)](https://sites.google.com/site/soundfonts4u/#h.p_biJ8J359lC5W). We recommend downloading the [SGM-v2.01 soundfont](https://drive.google.com/file/d/12zSPpFucZXFg-svKeu6dm7-Fe5m20xgJ/view) as this code has been tested using this soundfont. **Place the sf2 file in the [`dataset`](dataset) folder.**
+
+## Experiments
+
+# TODO: Talk about the scenarios
+
+
+To replicate our experiments, you will first need to meet certain requirements specified in the [`Dockerfile`](Dockerfile). Alternatively, you can set up a virtual environment if preferred. Once you have prepared your environment (either a Docker container or a virtual environment) and followed the steps in the [dataset](#dataset) section, you are ready to begin. Follow this recipe to replicate our experiments:
+
+> **Important note: To execute the following code, both Java and FluidSynth must be installed.**
+
+```bash
+$ cd dataset
+$ sh prepare_data.sh
+$ cd ..
+$ python main.py
+```
+
+## Citations
 
 ```bibtex
 @inproceedings{alfaro2022insights,
-  author       = {Alfaro-Contreras, Mar{\'i}a and Valero-Mas, Jose J. and I{\~n}esta, Jose M. and Calvo-Zaragoza, Jorge},
-  title        = {{Insights into transfer learning between image and audio music transcription}},
-  booktitle    = {{Proceedings of the 19th Sound and Music Computing Conference}},
-  year         = 2022,
-  pages        = {292--298},
-  month        = jun,
-  address      = {Saint-Étienne, France},
+  title     = {{Insights into Transfer Learning between Image and Audio Music Transcription}},
+  author    = {Alfaro-Contreras, Mar{\'\i}a and Valero-Mas, Jose J and I{\~n}esta, Jos{\'e} M and Calvo-Zaragoza, Jorge},
+  booktitle = {{Proceedings of the 19th Sound and Music Computing Conference}},
+  pages     = {295--301},
+  year      = {2022},
+  publisher = {Zenodo},
+  month     = jun,
+  address   = {Saint-Étienne, France},
+  doi       = {10.5281/zenodo.6797870},
 }
 ```
 
-----
+## Acknowledgments
 
-**Requirements**
+This work is part of the I+D+i PID2020-118447RA-I00 ([MultiScore](https://sites.google.com/view/multiscore-project)) project, funded by MCIN/AEI/10.13039/501100011033.
 
-tensorflow-gpu==2.3.1<br />
-pandas==1.3.0<br />
-numpy==1.18.5<br />
-opencv-python==4.5.3.56
+## License
+This work is under a [MIT](LICENSE) license.
