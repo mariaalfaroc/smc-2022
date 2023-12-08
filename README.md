@@ -24,7 +24,13 @@
 
 ## About
 
-# TODO: Describe the work. Add scheme if possible
+We consider a music transcription system, trained on either image (Optical Music Recognition, OMR) or audio (Automatic Music Transcription, AMT)[^1] data, and adapt its performance to the unseen domain during the training phase using different transfer learning schemes.
+
+[^1]: It is important to clarify that the model we are referring to is actually an Audio-to-Score (A2S) model. At the time of conducting this research, we used the term AMT because the distinction between AMT and A2S did not exist in the literature. However, nowadays, there is a clear distinction between the two. AMT typically focuses on note-level transcription, encoding the acoustic piece in terms of onset, offset, pitch values, and the musical instrument of the estimated notes. In contrast, A2S aims to achieve a score-level codification.
+
+<p align="center">
+  <img src="scheme.png" alt="content" style="border: 1px solid black; width: 800px;">
+</p> 
 
 ## How To Use
 
@@ -46,8 +52,9 @@ The specific steps to follow are:
 
 ## Experiments
 
-# TODO: Talk about the scenarios
-
+We consider two scenarios:
+- **Scenario A**. This scenario assesses the performance of the transcription models when transfer learning is both considered and ignored.
+- **Scenario B**. This scenario studies the amount of data required in the target domain for an efficient transfer process that outperforms the base case of ignoring transfer learning.
 
 To replicate our experiments, you will first need to meet certain requirements specified in the [`Dockerfile`](Dockerfile). Alternatively, you can set up a virtual environment if preferred. Once you have prepared your environment (either a Docker container or a virtual environment) and followed the steps in the [dataset](#dataset) section, you are ready to begin. Follow this recipe to replicate our experiments:
 
