@@ -31,12 +31,12 @@ def build_models(num_labels: int) -> Tuple[keras.Model, keras.Model]:
     x = layers.Conv2D(8, (10, 2), padding="same", use_bias=False, name="Conv2D_1")(
         image
     )
-    x = layers.BatchNormalization(name="BatchNorm_1")(x)
+    x = layers.BatchNormalization(name="BN_1")(x)
     x = layers.LeakyReLU(0.2, name="LeakyReLU_1")(x)
     x = layers.MaxPool2D(pool_size=(2, 2), strides=(2, 2), name="MaxPool2D_1")(x)
 
     x = layers.Conv2D(8, (8, 5), padding="same", use_bias=False, name="Conv2D_2")(x)
-    x = layers.BatchNormalization(name="BatchNorm_2")(x)
+    x = layers.BatchNormalization(name="BN_2")(x)
     x = layers.LeakyReLU(0.2, name="LeakyReLU_2")(x)
     x = layers.MaxPool2D(pool_size=(2, 1), strides=(2, 1), name="MaxPool2D_2")(x)
 
@@ -92,6 +92,15 @@ def build_models_from_pretrained(
 ) -> Tuple[keras.Model, keras.Model]:
     # Build the model used only for training
     model, _ = build_models(num_labels)
+    # Get layer names
+    layer_names = [layer.name for layer in model.layers]
+    # Check that all frozen layers are in the model
+    for layer_name in frozen_layers_names:
+        if layer_name not in layer_names:
+            raise ValueError(
+                f"Layer {layer_name} not found in the model."
+                f"Available layers: {layer_names}"
+            )
     # Load the weights of a pretrained model into the previously created model
     model.load_weights(filepath=pretrained_model_filepath, by_name=True)
     # Freeze some layers
