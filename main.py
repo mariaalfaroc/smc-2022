@@ -36,8 +36,8 @@ if __name__ == "__main__":
     # Perform transfer learning considering different frozen layers
     MODEL_BLOCKS = [
         ["Dense"],
-        ["Bidirectional_2", "LSTM_2"],
-        ["Bidirectional_1", "LSTM_1"],
+        ["Bidirectional_2"],
+        ["Bidirectional_1"],
         ["Conv2D_2", "BN_2"],
         ["Conv2D_1", "BN_1"],
     ]
