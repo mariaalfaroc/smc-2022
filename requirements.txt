@@ -1,0 +1,7 @@
+fire
+music21
+midi2audio
+librosa
+scikit-learn
+pandas
+opencv-python
