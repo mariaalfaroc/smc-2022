@@ -102,6 +102,7 @@ def build_models_from_pretrained(
                 f"Available layers: {layer_names}"
             )
     # Load the weights of a pretrained model into the previously created model
+    print(f"Loading pretrained model from {pretrained_model_filepath}")
     model.load_weights(filepath=pretrained_model_filepath, by_name=True)
     # Freeze some layers
     for layer in model.layers:
