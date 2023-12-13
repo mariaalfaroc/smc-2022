@@ -262,7 +262,7 @@ def k_fold_transfer_learning_experiment(
         output_dir = os.path.join(
             "results",
             "tl",
-            "-".join(frozen_layers_names),
+            "-".join(frozen_layers_names) if len(frozen_layers_names) > 0 else "None",
             size_dir_name,
             f"fold{id}",
         )
