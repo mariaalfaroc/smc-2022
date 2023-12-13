@@ -42,6 +42,12 @@ if __name__ == "__main__":
         ["Conv2D_1", "BN_1"],
     ]
     for task in ["omr", "amt"]:
+        k_fold_transfer_learning_experiment(
+            task=task,
+            frozen_layers_names=[],
+            epochs=EPOCHS,
+            batch_size=BATCH_SIZE,
+        )
         for i in range(1, len(MODEL_BLOCKS)):
             frozen_layers = list(chain(*MODEL_BLOCKS[:-i]))
             k_fold_transfer_learning_experiment(
